@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>수채화</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
+    <style>html,body{background:#f6f1e6;height:100%;margin:0;overflow:hidden}#view,#view canvas{width:100%;height:100%;display:block;position:fixed;inset:0}#loading{color:#6a6470;place-items:center;font:italic 28px/1.4 Nanum Pen Script,Segoe Print,Bradley Hand,Comic Sans MS,cursive;display:grid;position:fixed;inset:0}#caption{color:#6a6470;pointer-events:none;white-space:nowrap;opacity:.85;font:3.2vh/1 Nanum Pen Script,Segoe Print,Bradley Hand,Comic Sans MS,cursive;position:fixed;bottom:3.2vh;right:5.5vh;transform:rotate(-2deg)}#caption.off{display:none}#hint{color:#6a6470;pointer-events:none;white-space:nowrap;background:#faf6ece6;border-radius:3px;padding:6px 16px;font:20px/1.4 Nanum Pen Script,Segoe Print,Bradley Hand,Comic Sans MS,cursive;transition:opacity 2s;position:fixed;bottom:3.4vh;left:50%;transform:translate(-50%)}#hint.faded{opacity:0}#hint.off{display:none}#gear{z-index:3;cursor:pointer;color:#6a6470;background:#faf6ece6;border:0;border-radius:3px;padding:7px 14px;font:22px/1 Nanum Pen Script,Segoe Print,cursive;position:fixed;top:2.4vh;right:2.4vh;box-shadow:1px 1px 4px #50463c40}#gear:hover{background:#faf6ec}#panel{z-index:3;color:#55504f;background:#faf6ecf7;border-radius:3px;min-width:240px;padding:14px 18px;font:20px/1.5 Nanum Pen Script,Segoe Print,cursive;position:fixed;top:8.5vh;right:2.4vh;transform:rotate(-.6deg);box-shadow:2px 2px 8px #50463c4d}#panel.off{display:none}#panel h2{margin:0 0 8px;font:26px/1.2 Nanum Pen Script,Segoe Print,cursive}#panel label{cursor:pointer;align-items:center;gap:8px;margin:6px 0;display:flex}#panel input[type=range]{accent-color:#7a7264;flex:1}#panel input[type=checkbox]{accent-color:#7a7264;width:16px;height:16px}#panel .note{color:#8a8478;margin:4px 0 10px;font-size:16px}#panel button.apply{cursor:pointer;color:#f6f1e6;background:#7a7264;border:0;border-radius:3px;padding:7px 18px;font:20px/1 Nanum Pen Script,Segoe Print,cursive}</style>
+    <script type="module" crossorigin src="./assets/index-rVysHyUC.js"></script>
+  </head>
+  <body>
+    <div id="view"></div>
+    <div id="loading">연필을 깎는 중</div>
+    <div id="hint">클릭해서 둘러보기 &middot; WASD 이동 &middot; Shift 달리기 &middot; Space 점프 &middot; 휠로 물러나기 &middot; H 힌트 숨기기</div>
+    <button id="gear" type="button">설정</button>
+    <div id="panel" class="off">
+      <h2>설정</h2>
+      <label><input id="opt-hint" type="checkbox" checked /> 힌트 보이기</label>
+      <label><input id="opt-painted" type="checkbox" /> 처음부터 채색된 상태로 시작</label>
+      <label><input id="opt-wet" type="checkbox" checked /> 물 번짐 효과</label>
+      <label>연필 선 간격 <input id="opt-px" type="range" min="2" max="8" step="0.2" value="4.6" /></label>
+      <div class="note">채색·번짐·선 간격 변경은 적용 시 페이지를 다시 불러옵니다.</div>
+      <button class="apply" id="opt-apply" type="button">적용하고 다시 시작</button>
+    </div>
+    <script>
+      (() => {
+        const q = new URLSearchParams(location.search);
+        const panel = document.getElementById('panel');
+        const hint = document.getElementById('hint');
+        document.getElementById('gear').addEventListener('click', () => panel.classList.toggle('off'));
+        document.getElementById('opt-painted').checked = q.has('painted');
+        document.getElementById('opt-wet').checked = q.get('wet') !== '0';
+        document.getElementById('opt-px').value = q.has('px') ? q.get('px') : '4.6';
+        document.getElementById('opt-hint').addEventListener('change', (e) => { hint.classList.toggle('off', !e.target.checked); if (e.target.checked) hint.classList.remove('faded'); });
+        document.getElementById('opt-apply').addEventListener('click', () => {
+          const next = new URLSearchParams();
+          if (document.getElementById('opt-painted').checked) next.set('painted', '');
+          if (!document.getElementById('opt-wet').checked) next.set('wet', '0');
+          next.set('px', document.getElementById('opt-px').value);
+          const s = next.toString();
+          location.search = s ? '?' + s : '';
+        });
+      })();
+    </script>
+  </body>
+</html>

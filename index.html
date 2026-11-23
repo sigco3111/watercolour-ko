@@ -1,27 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Watercolour</title>
+    <title>수채화</title>
     <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
     <style>
       html, body { margin: 0; height: 100%; background: #f6f1e6; overflow: hidden; }
       #view, #view canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-      #loading { position: fixed; inset: 0; display: grid; place-items: center; color: #6a6470; font: italic 18px/1.4 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; color: #6a6470; font: italic 28px/1.4 'Nanum Pen Script', 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; }
       /* a note in pencil at the foot of the page */
-      #caption { position: fixed; right: 5.5vh; bottom: 3.2vh; color: #6a6470; font: 2.3vh/1 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; transform: rotate(-2deg); pointer-events: none; white-space: nowrap; opacity: 0.85; }
+      #caption { position: fixed; right: 5.5vh; bottom: 3.2vh; color: #6a6470; font: 3.2vh/1 'Nanum Pen Script', 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive; transform: rotate(-2deg); pointer-events: none; white-space: nowrap; opacity: 0.85; }
       #caption.off { display: none; }
-      #hint { position: fixed; left: 50%; bottom: 3.4vh; transform: translateX(-50%); color: #6a6470; font: 14px/1.4 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
+      #hint { position: fixed; left: 50%; bottom: 3.4vh; transform: translateX(-50%); color: #6a6470; font: 20px/1.4 'Nanum Pen Script', 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive;
         background: rgba(250, 246, 236, 0.9); padding: 6px 16px; border-radius: 3px; transition: opacity 2s; pointer-events: none; white-space: nowrap; }
       #hint.faded { opacity: 0; }
       #hint.off { display: none; }
+      /* settings, written on a scrap of paper in the corner */
+      #gear { position: fixed; top: 2.4vh; right: 2.4vh; z-index: 3; border: 0; cursor: pointer; color: #6a6470;
+        font: 22px/1 'Nanum Pen Script', 'Segoe Print', cursive; background: rgba(250, 246, 236, 0.9); padding: 7px 14px; border-radius: 3px; box-shadow: 1px 1px 4px rgba(80, 70, 60, 0.25); }
+      #gear:hover { background: rgba(250, 246, 236, 1); }
+      #panel { position: fixed; top: 8.5vh; right: 2.4vh; z-index: 3; color: #55504f; background: rgba(250, 246, 236, 0.97);
+        font: 20px/1.5 'Nanum Pen Script', 'Segoe Print', cursive; padding: 14px 18px; border-radius: 3px; box-shadow: 2px 2px 8px rgba(80, 70, 60, 0.3);
+        transform: rotate(-0.6deg); min-width: 240px; }
+      #panel.off { display: none; }
+      #panel h2 { margin: 0 0 8px; font: 26px/1.2 'Nanum Pen Script', 'Segoe Print', cursive; }
+      #panel label { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
+      #panel input[type='range'] { flex: 1; accent-color: #7a7264; }
+      #panel input[type='checkbox'] { accent-color: #7a7264; width: 16px; height: 16px; }
+      #panel .note { font-size: 16px; color: #8a8478; margin: 4px 0 10px; }
+      #panel button.apply { border: 0; cursor: pointer; color: #f6f1e6; background: #7a7264; font: 20px/1 'Nanum Pen Script', 'Segoe Print', cursive; padding: 7px 18px; border-radius: 3px; }
     </style>
   </head>
   <body>
     <div id="view"></div>
-    <div id="loading">Sharpening a pencil</div>
-    <div id="hint">Click to look &middot; WASD move &middot; Shift sprint &middot; Space jump &middot; wheel to step back</div>
+    <div id="loading">연필을 깎는 중</div>
+    <div id="hint">클릭해서 둘러보기 &middot; WASD 이동 &middot; Shift 달리기 &middot; Space 점프 &middot; 휠로 물러나기 &middot; H 힌트 숨기기</div>
+    <button id="gear" type="button">설정</button>
+    <div id="panel" class="off">
+      <h2>설정</h2>
+      <label><input id="opt-hint" type="checkbox" checked /> 힌트 보이기</label>
+      <label><input id="opt-painted" type="checkbox" /> 처음부터 채색된 상태로 시작</label>
+      <label><input id="opt-wet" type="checkbox" checked /> 물 번짐 효과</label>
+      <label>연필 선 간격 <input id="opt-px" type="range" min="2" max="8" step="0.2" value="4.6" /></label>
+      <div class="note">채색·번짐·선 간격 변경은 적용 시 페이지를 다시 불러옵니다.</div>
+      <button class="apply" id="opt-apply" type="button">적용하고 다시 시작</button>
+    </div>
+    <script>
+      (() => {
+        const q = new URLSearchParams(location.search);
+        const panel = document.getElementById('panel');
+        const hint = document.getElementById('hint');
+        document.getElementById('gear').addEventListener('click', () => panel.classList.toggle('off'));
+        document.getElementById('opt-painted').checked = q.has('painted');
+        document.getElementById('opt-wet').checked = q.get('wet') !== '0';
+        document.getElementById('opt-px').value = q.has('px') ? q.get('px') : '4.6';
+        document.getElementById('opt-hint').addEventListener('change', (e) => { hint.classList.toggle('off', !e.target.checked); if (e.target.checked) hint.classList.remove('faded'); });
+        document.getElementById('opt-apply').addEventListener('click', () => {
+          const next = new URLSearchParams();
+          if (document.getElementById('opt-painted').checked) next.set('painted', '');
+          if (!document.getElementById('opt-wet').checked) next.set('wet', '0');
+          next.set('px', document.getElementById('opt-px').value);
+          const s = next.toString();
+          location.search = s ? '?' + s : '';
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

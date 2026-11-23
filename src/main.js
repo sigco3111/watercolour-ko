@@ -49,7 +49,7 @@ addEventListener('resize', fitView);
 const scene = new THREE.Scene();
 lap('start');
 
-say('Sharpening a pencil');
+say('연필을 깎는 중');
 await turn();
 const pencil = createWash();
 const PX = q.has('px') ? +q.get('px') : 4.6;
@@ -76,7 +76,7 @@ const physics = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
 }
 lap('physics');
 
-say('Wetting the brush');
+say('붓을 적시는 중');
 const doll = await dollComing;
 const { man } = doll;
 scene.add(doll.group);
@@ -166,7 +166,7 @@ window.lab = Object.assign(lab, {
   view(eye, target) { follow.free = eye ? { position: new THREE.Vector3(...eye), target: new THREE.Vector3(...target) } : null; },
 });
 
-say('Blowing off the dust');
+say('먼지를 털어내는 중');
 await turn();
 if (!capture) await renderer.compileAsync(scene, camera);
 lap('shaders');
@@ -188,7 +188,7 @@ timings.warm = [];
 for (let i = 0; i < (capture ? 3 : 6); i++) {
   const t = performance.now();
   tick(1 / 60);
-  if (!capture) { await gpuDone(); say('Blowing off the dust'); await turn(); }
+  if (!capture) { await gpuDone(); say('먼지를 털어내는 중'); await turn(); }
   timings.warm.push(Math.round(performance.now() - t));
 }
 lap('first frames');

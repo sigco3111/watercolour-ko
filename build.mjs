@@ -23,3 +23,7 @@ const walk = (dir) => {
 };
 walk(dist);
 console.log(`dist: ${(bytes / 1048576).toFixed(1)} MB`);
+
+// GitHub Pages serves docs/ on main.
+fs.cpSync(dist, path.join(here, 'docs'), { recursive: true });
+console.log('docs/ updated for GitHub Pages');

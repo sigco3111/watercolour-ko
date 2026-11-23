@@ -9,3 +9,4 @@ shots/*
 *.log
 .env
 .test/
+node_modules

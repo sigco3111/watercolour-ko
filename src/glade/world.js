@@ -97,7 +97,7 @@ export async function createWorld({ pencil: wash, scene, say, turn }) {
   const ramp = (pal, t) => { t = Math.min(0.999, Math.max(0, t)) * 4; const i = Math.floor(t); return tmp.copy(pal.ramp[i]).lerp(pal.ramp[i + 1], t - i); };
 
   // ============================================================================================================ the sky
-  say('Stretching the paper');
+  say('종이를 물에 적시는 중');
   await turn();
   const skyT = { value: wash.paint.NEVER }, skyF = { value: wash.paint.NEVER };
   {
@@ -136,7 +136,7 @@ export async function createWorld({ pencil: wash, scene, say, turn }) {
   }
 
   // ========================================================================================================= the ground
-  say('Laying out the glade');
+  say('풍경을 그리는 중');
   await turn();
   {
     const g = new THREE.PlaneGeometry(96, 96, 240, 240).rotateX(-Math.PI / 2).translate(0, 0, -4), p = g.attributes.position;
@@ -181,7 +181,7 @@ export async function createWorld({ pencil: wash, scene, say, turn }) {
   }
 
   // ============================================================================================================= trees
-  say('Sketching the wood');
+  say('숲을 스케치하는 중');
   await turn();
   /** A bough of leaves. leaf: half the size of one touch of the brush (a touch leaves four to seven leaves). dens:
    *  touches to a square metre. turn: which way the leaves lie, if they all lie one way. stretch: how long they are. */
@@ -343,7 +343,7 @@ export async function createWorld({ pencil: wash, scene, say, turn }) {
   }
 
   // the wood beyond where one can walk, and the hills beyond that
-  say('Putting in the distance');
+  say('먼 풍경을 넣는 중');
   await turn();
   {
     const toSun = Math.atan2(SUN.x, SUN.z);
@@ -398,7 +398,7 @@ export async function createWorld({ pencil: wash, scene, say, turn }) {
   }
 
   // ====================================================================================== what grows low, and the stones
-  say('Sowing the meadow');
+  say('목초지에 씨를 뿌리는 중');
   await turn();
   {
     // stones in and beside the stream, and the stepping stones
